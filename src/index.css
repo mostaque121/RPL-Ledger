@@ -1,0 +1,297 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/plus-jakarta-sans";
+@import "@fontsource-variable/jetbrains-mono";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * RPL Ledger theme — high-contrast "ink & indigo" finance palette.
+ * Semantic money colours: success = money in, danger = money out,
+ * warning = held / due, info = neutral highlight.
+ */
+
+@theme inline {
+  --font-sans:
+    "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-cash: var(--chart-cash);
+  --color-chart-expense: var(--chart-expense);
+  --color-chart-profit: var(--chart-profit);
+
+  --color-table-head: var(--table-head);
+  --color-table-head-foreground: var(--table-head-foreground);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+}
+
+:root {
+  --radius: 0.625rem;
+
+  --background: oklch(0.975 0.006 255);
+  --foreground: oklch(0.19 0.035 262);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.19 0.035 262);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.19 0.035 262);
+
+  --primary: oklch(0.47 0.21 266);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.93 0.018 262);
+  --secondary-foreground: oklch(0.22 0.04 262);
+  --muted: oklch(0.945 0.01 258);
+  --muted-foreground: oklch(0.44 0.03 260);
+  --accent: oklch(0.93 0.035 266);
+  --accent-foreground: oklch(0.3 0.12 266);
+  --destructive: oklch(0.55 0.22 25);
+  --border: oklch(0.87 0.014 260);
+  --input: oklch(0.84 0.016 260);
+  --ring: oklch(0.47 0.21 266);
+
+  --success: oklch(0.52 0.14 158);
+  --success-foreground: oklch(0.99 0 0);
+  --warning: oklch(0.66 0.16 62);
+  --warning-foreground: oklch(0.2 0.05 60);
+  --danger: oklch(0.55 0.22 18);
+  --danger-foreground: oklch(0.99 0 0);
+  --info: oklch(0.55 0.15 235);
+  --info-foreground: oklch(0.99 0 0);
+
+  /* charts: income, expense, profit, hold, extra */
+  --chart-1: oklch(0.56 0.15 158);
+  --chart-2: oklch(0.6 0.21 18);
+  --chart-3: oklch(0.5 0.21 266);
+  --chart-4: oklch(0.72 0.16 65);
+  --chart-5: oklch(0.6 0.14 225);
+  /* trend chart series (validated for colour-blind separation, light surface) */
+  --chart-cash: oklch(0.64 0.15 255);
+  --chart-expense: oklch(0.64 0.16 50);
+  --chart-profit: oklch(0.48 0.15 330);
+
+  /* table header: plain neutral grey (no tint), dark labels */
+  --table-head: oklch(99.405% 0.00011 271.152);
+  --table-head-foreground: oklch(23.503% 0.00003 271.152);
+
+  /* dark ink sidebar in both themes for a strong frame */
+  --sidebar: oklch(0.22 0.045 264);
+  --sidebar-foreground: oklch(0.9 0.015 260);
+  --sidebar-primary: oklch(0.68 0.17 266);
+  --sidebar-primary-foreground: oklch(0.15 0.04 264);
+  --sidebar-accent: oklch(0.3 0.06 264);
+  --sidebar-accent-foreground: oklch(0.99 0 0);
+  --sidebar-border: oklch(0.32 0.04 264);
+  --sidebar-ring: oklch(0.68 0.17 266);
+}
+
+.dark {
+  /* surfaces step up from the near-black sidebar frame: sidebar 0.11 → page 0.19 → card 0.23 */
+  --background: oklch(0.19 0.026 264);
+  --foreground: oklch(0.97 0.006 260);
+  --card: oklch(0.23 0.032 264);
+  --card-foreground: oklch(0.97 0.006 260);
+  --popover: oklch(0.25 0.034 264);
+  --popover-foreground: oklch(0.97 0.006 260);
+
+  --primary: oklch(0.7 0.16 266);
+  --primary-foreground: oklch(0.15 0.04 264);
+  --secondary: oklch(0.31 0.035 264);
+  --secondary-foreground: oklch(0.96 0.006 260);
+  --muted: oklch(0.285 0.03 264);
+  --muted-foreground: oklch(0.76 0.025 260);
+  --accent: oklch(0.33 0.065 266);
+  --accent-foreground: oklch(0.96 0.02 266);
+  --destructive: oklch(0.68 0.2 22);
+  --border: oklch(1 0 0 / 13%);
+  --input: oklch(1 0 0 / 18%);
+  --ring: oklch(0.7 0.16 266);
+
+  --success: oklch(0.74 0.16 158);
+  --success-foreground: oklch(0.17 0.04 160);
+  --warning: oklch(0.8 0.15 75);
+  --warning-foreground: oklch(0.2 0.05 60);
+  --danger: oklch(0.7 0.19 20);
+  --danger-foreground: oklch(0.15 0.04 20);
+  --info: oklch(0.74 0.13 230);
+  --info-foreground: oklch(0.15 0.04 230);
+
+  --chart-1: oklch(0.74 0.16 158);
+  --chart-2: oklch(0.7 0.19 20);
+  --chart-3: oklch(0.7 0.16 266);
+  --chart-4: oklch(0.8 0.15 75);
+  --chart-5: oklch(0.74 0.13 230);
+  --chart-cash: oklch(0.64 0.15 255);
+  --chart-expense: oklch(0.64 0.16 50);
+  --chart-profit: oklch(0.52 0.15 330);
+
+  --table-head: oklch(0.23 0.032 264);
+  --table-head-foreground: oklch(0.9 0 0);
+
+  --sidebar: oklch(0.11 0.02 264);
+  --sidebar-foreground: oklch(0.88 0.015 260);
+  --sidebar-primary: oklch(0.7 0.16 266);
+  --sidebar-primary-foreground: oklch(0.15 0.04 264);
+  --sidebar-accent: oklch(0.2 0.04 264);
+  --sidebar-accent-foreground: oklch(0.99 0 0);
+  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-ring: oklch(0.7 0.16 266);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans antialiased;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/*
+ * Money / figures: the UI font with tabular (equal-width) digits, so columns still line up
+ * but the `$` sits tight against the number (a monospaced `$` looks detached).
+ */
+@utility money {
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings:
+    "tnum" 1,
+    "lnum" 1;
+  letter-spacing: -0.005em;
+}
+
+/*
+ * A slim, quiet scrollbar for inner scroll areas (e.g. the sale page's columns): 4px in Chrome / Edge /
+ * Safari, the browser's "thin" in Firefox. Chrome ignores the ::-webkit-scrollbar rules whenever the
+ * standard scrollbar-width / scrollbar-color are set, so those only apply where ::-webkit-scrollbar doesn't exist.
+ */
+@utility scrollbar-slim {
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklch, var(--foreground) 22%, transparent)
+      transparent;
+  }
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: color-mix(in oklch, var(--foreground) 18%, transparent);
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background: color-mix(in oklch, var(--foreground) 35%, transparent);
+  }
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+}
+
+/*
+ * Print: just the page content, in the light palette (even in dark mode), on white.
+ * Mark anything else to skip with `print:hidden`.
+ */
+@media print {
+  @page {
+    margin: 12mm;
+  }
+  [data-slot="sidebar-gap"],
+  [data-slot="sidebar-container"],
+  [data-slot="sidebar-rail"] {
+    display: none !important;
+  }
+  [data-slot="sidebar-wrapper"],
+  [data-slot="sidebar-inset"],
+  [data-slot="app-scroll"] {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+  html,
+  body {
+    background: white !important;
+  }
+  .dark {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.19 0.035 262);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.19 0.035 262);
+    --muted: oklch(0.945 0.01 258);
+    --muted-foreground: oklch(0.44 0.03 260);
+    --accent: oklch(0.93 0.035 266);
+    --accent-foreground: oklch(0.3 0.12 266);
+    --border: oklch(0.87 0.014 260);
+    --primary: oklch(0.47 0.21 266);
+    --success: oklch(0.52 0.14 158);
+    --warning: oklch(0.66 0.16 62);
+    --warning-foreground: oklch(0.2 0.05 60);
+    --danger: oklch(0.55 0.22 18);
+    --info: oklch(0.55 0.15 235);
+  }
+  :root,
+  .dark {
+    --table-head: oklch(0.94 0 0);
+    --table-head-foreground: oklch(0.25 0 0);
+  }
+}

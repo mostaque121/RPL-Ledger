@@ -1,0 +1,32 @@
+# deps & build
+node_modules
+dist
+dist-ssr
+*.local
+
+# secrets & client data
+.env
+.env.local
+.env.*.local
+# client data folder at the root only (a bare `data/` also hid src/components/data from git and Tailwind)
+/data/
+*.xlsx
+*.xls
+*.csv
+
+# editor / os
+.DS_Store
+Thumbs.db
+*.log
+.vscode/*
+!.vscode/extensions.json
+.idea
+coverage
+
+# supabase local
+supabase/.temp
+supabase/.branches
+
+# backups (client data)
+/backups/
+*.dump
