@@ -215,6 +215,9 @@ Every phase ends with `npm run build`, `npm run lint`, `npm test`, all green.
 - **Backup:** Settings → Backup downloads one `.xlsx` with every table (all rows, paged past 1000) and a
   contents sheet (`features/settings/backup.ts`, tested). `docs/BACKUP.md`: what Supabase keeps per plan,
   `pg_dump` copy and restore.
+- **First load:** form libraries (zod, react-hook-form, date picker) and table libraries (TanStack Table,
+  dnd-kit) are their own on-demand chunks instead of part of `vendor`, and the login page is lazy. First
+  download went from ~387 KB to ~309 KB gzipped; the dashboard needs neither chunk.
 - **Deploy:** Cloudflare Pages via Git (`docs/DEPLOY.md`). `.node-version` (22), `public/_headers`
   (immutable `/assets/*`, security headers, `noindex`), `robots.txt`. No `_redirects`: without a `404.html`
   Pages serves `index.html` for every path.
@@ -228,6 +231,7 @@ Every phase ends with `npm run build`, `npm run lint`, `npm test`, all green.
 | Profit recognition | Profit, tax, and the partner split count in the month a sale is **marked completed** (`completed_on`), for every seller. Full payment is shown as a hint only. |
 | Cash view | Cash in, RTO paid, and hold always use the actual payment dates. |
 | Cancelled sales | No profit, tax, due, or hold. Money actually received or paid still shows as cash. Refunds are negative payments. |
+| Refunded sales | A cancelled sale with a client refund (negative payment). Not stored: derived. "Refund client" on the sale page adds the refund and cancels the sale in one step. Shows a Refunded badge and has its own State filter. |
 | Money in code | Integer **cents** everywhere in the app. Dollars only at the DB boundary and on screen. |
 | Partner identity | `people.partner_key` = `tanvir` / `md`, not matched on names. |
 | Removing people | People with history are **deactivated**, not deleted. |

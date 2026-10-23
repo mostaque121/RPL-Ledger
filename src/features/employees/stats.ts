@@ -11,7 +11,7 @@ import { rateOn, type PayRate } from './rates'
 
 export type StatSale = Pick<
   SaleView,
-  'id' | 'sellerId' | 'clientName' | 'saleDate' | 'completedOn' | 'cancelled' | 'commission' | 'summary'
+  'id' | 'sellerId' | 'clientName' | 'saleDate' | 'completedOn' | 'cancelled' | 'payments' | 'commission' | 'summary'
 >
 export type StatExpense = Pick<Expense, 'employeeId' | 'category' | 'spentOn' | 'bdt' | 'amountAud'>
 

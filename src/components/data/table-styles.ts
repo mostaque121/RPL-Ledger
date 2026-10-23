@@ -12,3 +12,15 @@ export const HEAD_CELL =
 export const BODY_CELL = 'first:pl-4'
 
 export const FOOT_CELL = 'font-bold whitespace-nowrap first:pl-4'
+
+/**
+ * `fill` tables: the card takes the height its parent leaves it and only the rows scroll,
+ * under a header (and above a totals footer) that stay put. The shadcn `Table` wrapper's own
+ * overflow is switched off, so this one box scrolls both ways and `sticky` works against it.
+ */
+export const FILL_CARD = 'flex min-h-0 flex-1 flex-col'
+export const FILL_GRID = 'min-h-0 flex-1 overflow-auto [&>[data-slot=table-container]]:overflow-visible'
+export const STICKY_HEAD = 'sticky top-0 z-10'
+/** Opaque, so rows don't show through; a shadow stands in for the border, which wouldn't stick. */
+export const STICKY_FOOT = 'sticky bottom-0 z-10 border-t-0 bg-card shadow-[0_-1px_0_var(--color-border)]'
+export const STICKY_FOOT_ROW = 'bg-muted/50 hover:bg-muted/50'

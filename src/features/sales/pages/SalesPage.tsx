@@ -23,6 +23,13 @@ import { useSalesParams } from '../hooks/use-sales-params'
 import { saleHref } from '../links'
 import { effectiveFilters, FILTER_FIELD, SALE_COLUMNS, SALE_FILTERS, type SaleFilterId } from '../view'
 
+/**
+ * On desktop the page is exactly the visible card's height (the inset's 100svh − 1rem, minus the
+ * 3.5rem top bar and the 3rem of `main` padding), so the table card fills the rest and only its rows
+ * scroll. Phones keep the normal page scroll.
+ */
+const FILL_PAGE = 'flex flex-col gap-4 md:h-[calc(100svh-7.5rem)]'
+
 export function SalesPage() {
   const sales = useSalesQuery()
   const people = usePeopleQuery()
@@ -55,8 +62,12 @@ export function SalesPage() {
   // A few hundred rows at most, so filtering on every render is fine.
   const active = effectiveFilters(filters, shownFilters)
   const shown = all ? filterSales(all, active) : []
-  const countFor = (owner: OwnerFilter) => (all ? filterSales(all, { ...active, owner }).length : 0)
-  const counts = all ? { all: countFor('all'), mine: countFor('mine'), others: countFor('others') } : null
+  const countFor = (owner: OwnerFilter, f: SalesFilters = active) => (all ? filterSales(all, { ...f, owner }).length : 0)
+  // Until it's opened, the RTO tab counts every month, as opening it switches to all months.
+  const rtoDueCount = countFor('rtoDue', filters.owner === 'rtoDue' ? active : { ...active, month: 'all' })
+  const counts = all ? { all: countFor('all'), mine: countFor('mine'), others: countFor('others'), rtoDue: rtoDueCount } : null
+  /** An old sale can still owe its RTO, so the RTO tab opens on all months. */
+  const changeTab = (owner: OwnerFilter) => setFilters(owner === 'rtoDue' ? { owner, month: 'all' } : { owner })
 
   const customize: CustomizerSection[] = [
     { key: 'columns', label: 'Columns', defs: SALE_COLUMNS, items: columns, onChange: setColumns, onReset: resetColumns },
@@ -106,8 +117,8 @@ export function SalesPage() {
         query={sales}
         loading={
           // Tabs and filters work straight away; only the rows wait for the data.
-          <div className="space-y-4">
-            <SalesTabs value={filters.owner} onChange={(owner) => setFilters({ owner })} counts={null} />
+          <div className={FILL_PAGE}>
+            <SalesTabs value={filters.owner} onChange={changeTab} counts={null} />
             {toolbar}
             <SalesTableSkeleton view={columns} />
           </div>
@@ -122,8 +133,8 @@ export function SalesPage() {
               action={addButton}
             />
           ) : (
-            <div className="space-y-4">
-              <SalesTabs value={filters.owner} onChange={(owner) => setFilters({ owner })} counts={counts} />
+            <div className={FILL_PAGE}>
+              <SalesTabs value={filters.owner} onChange={changeTab} counts={counts} />
               {toolbar}
               <SalesTable
                 sales={shown}

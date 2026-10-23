@@ -17,10 +17,10 @@ const defaults = (): SalesFilters => ({
 })
 
 const validators = {
-  owner: oneOf(['all', 'mine', 'others']),
+  owner: oneOf(['all', 'mine', 'others', 'rtoDue']),
   month: isMonthOrAll,
   payment: oneOf(['all', 'due', 'Paid', 'Partial', 'Unpaid']),
-  state: oneOf(['all', 'open', 'completed', 'cancelled']),
+  state: oneOf(['all', 'open', 'completed', 'cancelled', 'refunded']),
   rtoPay: oneOf(['all', 'due']),
   source: oneOf(['all', ...SALE_SOURCES]),
 }

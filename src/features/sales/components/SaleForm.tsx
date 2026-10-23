@@ -1,10 +1,10 @@
-import { useMemo, useRef, useState, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { EyeIcon, FileTextIcon, GraduationCapIcon, Loader2Icon, UserRoundIcon, WalletIcon, type LucideIcon } from 'lucide-react'
 import { Controller, useForm, useWatch, type Control, type FieldError as RhfFieldError } from 'react-hook-form'
 import { useBlocker } from 'react-router'
 import { ConfirmDialog } from '@/components/feedback/ConfirmDialog'
-import { Combobox, type ComboboxOption } from '@/components/forms/Combobox'
+import { Combobox } from '@/components/forms/Combobox'
 import { DatePicker } from '@/components/forms/DatePicker'
 import { MoneyInput } from '@/components/forms/MoneyInput'
 import { FormModalBody, FormModalFooter, FormModalHeader } from '@/components/layout/FormModal'
@@ -13,13 +13,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { usePeopleQuery } from '@/features/employees/api'
-import { coursesApi, useCoursesQuery } from '@/features/settings/api/courses'
-import { useRtosQuery } from '@/features/settings/api/rtos'
+import { coursesApi } from '@/features/settings/api/courses'
 import { saleProfit, type Settings } from '@/lib/accounting'
 import { formatAud, todayInSydney } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useCreateSaleMutation, useUpdateSaleMutation, type SaleInput, type SaleView } from '../api/sales'
+import { useSaleOptions } from '../hooks/use-sale-options'
 import { SALE_SOURCES, saleSchema, type SaleValues } from '../schema'
 import { SalePreview } from './SalePreview'
 
@@ -57,9 +56,6 @@ function defaults(sale?: SaleView): SaleValues {
 const orNull = (text: string) => (text.trim() === '' ? null : text.trim())
 
 /** Keeps inactive items that this sale already uses, so editing an old sale still shows them. */
-const pickable = <T extends { id: string; active: boolean }>(items: T[] | undefined, keep: string | null | undefined) =>
-  (items ?? []).filter((i) => i.active || i.id === keep)
-
 /** One block of the form: a titled card. */
 function FormCard({ icon: Icon, title, description, children }: { icon: LucideIcon; title: string; description?: string; children: ReactNode }) {
   return (
@@ -80,9 +76,7 @@ function FormCard({ icon: Icon, title, description, children }: { icon: LucideIc
 
 /** Add or edit a sale, in the full-page form modal (see `SaleModal`). */
 export function SaleForm({ settings, sale, onSaved }: SaleFormProps) {
-  const people = usePeopleQuery()
-  const rtos = useRtosQuery()
-  const courses = useCoursesQuery()
+  const { people, sellerOptions, courseOptions, rtoOptions } = useSaleOptions(sale)
   const createCourse = coursesApi.useCreateMutation()
   const create = useCreateSaleMutation()
   const update = useUpdateSaleMutation()
@@ -107,25 +101,6 @@ export function SaleForm({ settings, sale, onSaved }: SaleFormProps) {
       isDirty &&
       !saved.current &&
       (currentLocation.pathname !== nextLocation.pathname || currentLocation.search !== nextLocation.search),
-  )
-
-  const sellerOptions = useMemo<ComboboxOption[]>(
-    () =>
-      pickable(people.data, sale?.sellerId).map((p) => ({
-        value: p.id,
-        label: p.name,
-        group: p.role === 'partner' ? 'Partners' : 'Employees',
-        hint: p.role === 'partner' ? 'Own sale' : '60/40',
-      })),
-    [people.data, sale?.sellerId],
-  )
-  const courseOptions = useMemo(
-    () => pickable(courses.data, sale?.courseId).map((c) => ({ value: c.id, label: c.name })),
-    [courses.data, sale?.courseId],
-  )
-  const rtoOptions = useMemo(
-    () => pickable(rtos.data, sale?.rtoId).map((r) => ({ value: r.id, label: r.name })),
-    [rtos.data, sale?.rtoId],
   )
 
   const seller = people.data?.find((p) => p.id === sellerId)

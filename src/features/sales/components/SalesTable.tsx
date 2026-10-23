@@ -1,13 +1,16 @@
 import { useMemo, type ReactNode } from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
+import { ExternalLinkIcon } from 'lucide-react'
 import { Amount } from '@/components/data/Amount'
 import { DataTable } from '@/components/data/DataTable'
 import { DataTableSkeleton } from '@/components/data/DataTableSkeleton'
+import { Button } from '@/components/ui/button'
 import { salesTotals } from '@/lib/accounting'
 import { formatDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { ViewItem } from '@/lib/view-prefs'
 import type { SaleView } from '../api/sales'
+import { saleHref } from '../links'
 import type { SaleColumnId } from '../view'
 import { SaleBadges } from './SaleBadges'
 
@@ -96,6 +99,30 @@ const columns: ColumnDef<SaleView, unknown>[] = [
     cell: ({ row }) => <SaleBadges sale={row.original} />,
     meta: { skeleton: 'badge' },
   },
+  {
+    // Always last, and not in the viewer's column picker.
+    id: 'newTab',
+    header: '',
+    enableSorting: false,
+    meta: { align: 'right', skeleton: 'icon' },
+    cell: ({ row }) => (
+      <Button asChild variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-foreground">
+        <a
+          href={saleHref(row.original.id)}
+          target="_blank"
+          rel="noopener"
+          aria-label={`Open ${row.original.clientName} in a new tab`}
+          title="Open in new tab"
+          // The row's own click would open the sale here too.
+          onClick={(e) => e.stopPropagation()}
+          onAuxClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+        >
+          <ExternalLinkIcon />
+        </a>
+      </Button>
+    ),
+  },
 ]
 
 interface SalesTableProps {
@@ -125,7 +152,7 @@ export function SalesTableSkeleton({ view }: { view: readonly ViewItem<SaleColum
   const shaped = columnVisibility.course
     ? columns.map((c) => (c.id === 'client' ? { ...c, meta: { skeleton: 'text' as const } } : c))
     : columns
-  return <DataTableSkeleton columns={shaped} columnOrder={columnOrder} columnVisibility={columnVisibility} totals={TOTAL_IDS} rows={10} />
+  return <DataTableSkeleton columns={shaped} columnOrder={columnOrder} columnVisibility={columnVisibility} totals={TOTAL_IDS} rows={10} fill />
 }
 
 export function SalesTable({ sales, onOpen, view, toolbar, empty }: SalesTableProps) {
@@ -138,12 +165,14 @@ export function SalesTable({ sales, onOpen, view, toolbar, empty }: SalesTablePr
       columns={columns}
       getRowId={(s) => s.id}
       onRowClick={onOpen}
+      rowHref={(s) => saleHref(s.id)}
       rowClassName={(s) => s.cancelled && 'opacity-60'}
       noun="sale"
       columnOrder={columnOrder}
       columnVisibility={columnVisibility}
       toolbar={toolbar}
       empty={empty}
+      fill
       totals={{
         fee: <Amount short cents={t.courseFee} />,
         rtoCost: <Amount short cents={t.rtoCost} />,

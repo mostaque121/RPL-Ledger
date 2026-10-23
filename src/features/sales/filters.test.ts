@@ -89,10 +89,23 @@ describe('filterSales', () => {
     expect(ids({ rtoPay: 'due' })).toEqual(['a', 'b', 'd']) // c is cancelled
   })
 
+  it('the RTO payment pending tab shows every seller’s sales the RTO is still owed for', () => {
+    expect(ids({ owner: 'rtoDue' })).toEqual(['a', 'b', 'd'])
+    expect(ids({ owner: 'rtoDue', sellerId: 'reaz-id' })).toEqual([])
+  })
+
   it('filters by state', () => {
     expect(ids({ state: 'open' })).toEqual(['b', 'd'])
     expect(ids({ state: 'completed' })).toEqual(['a'])
     expect(ids({ state: 'cancelled' })).toEqual(['c'])
+  })
+
+  it('a cancelled sale with money given back is Refunded, not Cancelled', () => {
+    const refund = [...part, { id: 'r', paidOn: '2026-03-09', amount: -toCents(300), note: 'Refund' }]
+    const list = [...sales, sale('e', { cancelled: true, payments: refund })]
+    const states = (state: SalesFilters['state']) => filterSales(list, { ...ALL, state }).map((s) => s.id)
+    expect(states('refunded')).toEqual(['e'])
+    expect(states('cancelled')).toEqual(['c'])
   })
 
   it('searches name, phone, course, RTO and seller, ignoring case', () => {

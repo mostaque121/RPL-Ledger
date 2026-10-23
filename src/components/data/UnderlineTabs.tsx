@@ -17,9 +17,11 @@ interface TriggerProps extends ComponentProps<typeof Tabs.Trigger> {
   showZero?: boolean
   /** The count is still loading: a placeholder pill keeps its place. */
   countPending?: boolean
+  /** `warning` colours the count pill, for a tab that needs attention. */
+  tone?: 'warning'
 }
 
-export function UnderlineTabsTrigger({ className, children, count, showZero, countPending, ...props }: TriggerProps) {
+export function UnderlineTabsTrigger({ className, children, count, showZero, countPending, tone, ...props }: TriggerProps) {
   return (
     <Tabs.Trigger
       className={cn(
@@ -33,7 +35,14 @@ export function UnderlineTabsTrigger({ className, children, count, showZero, cou
       {children}
       {countPending && <Skeleton aria-hidden className="h-4.5 w-5 rounded-full" />}
       {!countPending && count !== undefined && (count > 0 || showZero) && (
-        <span className="money rounded-full bg-muted px-1.5 text-[11px] leading-4.5 font-bold text-muted-foreground group-data-[state=active]:bg-foreground group-data-[state=active]:text-background">
+        <span
+          className={cn(
+            'money rounded-full px-1.5 text-[11px] leading-4.5 font-bold',
+            tone === 'warning' && count > 0
+              ? 'bg-warning text-warning-foreground'
+              : 'bg-muted text-muted-foreground group-data-[state=active]:bg-foreground group-data-[state=active]:text-background',
+          )}
+        >
           {count}
         </span>
       )}

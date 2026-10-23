@@ -4,9 +4,13 @@ import type { SaleView } from './api/sales'
 
 /** `due` = anything still owed (Partial or Unpaid). */
 export type PaymentFilter = 'all' | 'due' | PaymentStatus
-export type StateFilter = 'all' | 'open' | 'completed' | 'cancelled'
-/** The list's tabs: every sale, Tanvir's own (he is the only user), or everyone else's. */
-export type OwnerFilter = 'all' | 'mine' | 'others'
+/** `refunded` = cancelled, with money given back to the client (a negative payment). */
+export type StateFilter = 'all' | 'open' | 'completed' | 'cancelled' | 'refunded'
+/**
+ * The list's tabs: every sale, Tanvir's own (he is the only user), everyone else's, or
+ * `rtoDue` = any seller's sale the RTO is still owed money for (a quick lookup).
+ */
+export type OwnerFilter = 'all' | 'mine' | 'others' | 'rtoDue'
 
 export type SalesFilters = {
   owner: OwnerFilter
@@ -23,8 +27,10 @@ export type SalesFilters = {
   search: string
 }
 
-export const saleState = (s: Pick<SaleView, 'cancelled' | 'completedOn'>): Exclude<StateFilter, 'all'> =>
-  s.cancelled ? 'cancelled' : s.completedOn ? 'completed' : 'open'
+export const isRefunded = (s: Pick<SaleView, 'cancelled' | 'payments'>) => s.cancelled && s.payments.some((p) => p.amount < 0)
+
+export const saleState = (s: Pick<SaleView, 'cancelled' | 'completedOn' | 'payments'>): Exclude<StateFilter, 'all'> =>
+  isRefunded(s) ? 'refunded' : s.cancelled ? 'cancelled' : s.completedOn ? 'completed' : 'open'
 
 function matchesPayment(sale: SaleView, filter: PaymentFilter) {
   if (filter === 'all') return true
@@ -40,18 +46,26 @@ function matchesSearch(sale: SaleView, needle: string) {
   )
 }
 
+const rtoOwed = (s: SaleView) => !s.cancelled && s.summary.rtoDue > 0
+
+function matchesOwner(sale: SaleView, owner: OwnerFilter) {
+  if (owner === 'all') return true
+  if (owner === 'rtoDue') return rtoOwed(sale)
+  return (sale.seller === 'tanvir') === (owner === 'mine')
+}
+
 export function filterSales(sales: readonly SaleView[], f: SalesFilters): SaleView[] {
   const needle = f.search.trim().toLowerCase()
   return sales.filter(
     (s) =>
-      (f.owner === 'all' || (s.seller === 'tanvir') === (f.owner === 'mine')) &&
+      matchesOwner(s, f.owner) &&
       (f.month === 'all' || monthOf(s.saleDate) === f.month) &&
       (f.sellerId === 'all' || s.sellerId === f.sellerId) &&
       (f.rtoId === 'all' || s.rtoId === f.rtoId) &&
       (f.courseId === 'all' || s.courseId === f.courseId) &&
       (f.source === 'all' || s.source === f.source) &&
       (f.state === 'all' || saleState(s) === f.state) &&
-      (f.rtoPay === 'all' || (!s.cancelled && s.summary.rtoDue > 0)) &&
+      (f.rtoPay === 'all' || rtoOwed(s)) &&
       matchesPayment(s, f.payment) &&
       matchesSearch(s, needle),
   )

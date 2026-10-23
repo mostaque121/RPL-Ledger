@@ -13,7 +13,18 @@ import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from 'lucide-react'
 import type { CellSkeleton } from './DataTableSkeleton'
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
-import { BODY_CELL, FOOT_CELL, HEAD_CELL, HEAD_ROW, TABLE_CARD } from './table-styles'
+import {
+  BODY_CELL,
+  FILL_CARD,
+  FILL_GRID,
+  FOOT_CELL,
+  HEAD_CELL,
+  HEAD_ROW,
+  STICKY_FOOT,
+  STICKY_FOOT_ROW,
+  STICKY_HEAD,
+  TABLE_CARD,
+} from './table-styles'
 
 declare module '@tanstack/react-table' {
   // The type parameters must match TanStack's own declaration.
@@ -31,6 +42,8 @@ interface DataTableProps<T> {
   getRowId: (row: T) => string
   /** Click / Enter on a row. */
   onRowClick?: (row: T) => void
+  /** The row's own page: Ctrl / ⌘ / Shift + click, Ctrl + Enter or a middle click opens it in a new tab. */
+  rowHref?: (row: T) => string
   rowClassName?: (row: T) => string | false | undefined
   /** Footer cells by column id. The first column shows the row count. */
   totals?: Partial<Record<string, ReactNode>>
@@ -44,6 +57,8 @@ interface DataTableProps<T> {
   toolbar?: ReactNode
   /** Shown in the card instead of the table when there are no rows. */
   empty?: ReactNode
+  /** Fill the parent's height: only the rows scroll, the header and totals stay in view (see `FILL_CARD`). */
+  fill?: boolean
 }
 
 const alignRight = (meta: { align?: 'right' } | undefined) => meta?.align === 'right' && 'text-right'
@@ -54,6 +69,7 @@ export function DataTable<T>({
   columns,
   getRowId,
   onRowClick,
+  rowHref,
   rowClassName,
   totals,
   noun = 'row',
@@ -61,6 +77,7 @@ export function DataTable<T>({
   columnVisibility,
   toolbar,
   empty,
+  fill = false,
 }: DataTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([])
   // The React Compiler isn't used here, so TanStack Table's non-memoisable API is fine.
@@ -75,10 +92,12 @@ export function DataTable<T>({
     getRowId,
   })
 
+  const openInNewTab = (row: T) => rowHref && window.open(rowHref(row), '_blank', 'noopener')
+
   const grid = (
-    <div className="overflow-x-auto">
+    <div className={fill ? FILL_GRID : 'overflow-x-auto'}>
       <Table>
-        <TableHeader>
+        <TableHeader className={cn(fill && STICKY_HEAD)}>
           {table.getHeaderGroups().map((group) => (
             <TableRow key={group.id} className={HEAD_ROW}>
               {group.headers.map((header) => {
@@ -120,9 +139,20 @@ export function DataTable<T>({
             <TableRow
               key={row.id}
               tabIndex={onRowClick ? 0 : undefined}
-              onClick={onRowClick && (() => onRowClick(row.original))}
+              onClick={
+                onRowClick &&
+                ((e) => (rowHref && (e.ctrlKey || e.metaKey || e.shiftKey) ? openInNewTab(row.original) : onRowClick(row.original)))
+              }
+              // Middle click: stop the browser's autoscroll, then open the row like a link would.
+              onMouseDown={rowHref && ((e) => e.button === 1 && e.preventDefault())}
+              onAuxClick={rowHref && ((e) => e.button === 1 && openInNewTab(row.original))}
               onKeyDown={
-                onRowClick && ((e) => e.key === 'Enter' && e.target === e.currentTarget && onRowClick(row.original))
+                onRowClick &&
+                ((e) => {
+                  if (e.key !== 'Enter' || e.target !== e.currentTarget) return
+                  if (rowHref && (e.ctrlKey || e.metaKey)) openInNewTab(row.original)
+                  else onRowClick(row.original)
+                })
               }
               className={cn(onRowClick && 'cursor-pointer', rowClassName?.(row.original))}
             >
@@ -136,8 +166,8 @@ export function DataTable<T>({
         </TableBody>
 
         {totals && (
-          <TableFooter>
-            <TableRow className="hover:bg-transparent">
+          <TableFooter className={cn(fill && STICKY_FOOT)}>
+            <TableRow className={cn('hover:bg-transparent', fill && STICKY_FOOT_ROW)}>
               {table.getVisibleLeafColumns().map((column, _, visible) => {
                 // The row count goes in the first column that has no total of its own.
                 const countHere = visible.find((c) => totals[c.id] === undefined)?.id === column.id
@@ -155,8 +185,8 @@ export function DataTable<T>({
   )
 
   return (
-    <div className={TABLE_CARD}>
-      {toolbar && <div className="border-b">{toolbar}</div>}
+    <div className={cn(TABLE_CARD, fill && FILL_CARD)}>
+      {toolbar && <div className="shrink-0 border-b">{toolbar}</div>}
       {data.length === 0 && empty ? <div className="p-4 sm:p-6">{empty}</div> : grid}
     </div>
   )

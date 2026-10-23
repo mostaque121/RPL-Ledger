@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BanIcon, CircleCheckBigIcon, EllipsisIcon, PencilIcon, RotateCcwIcon, Trash2Icon } from 'lucide-react'
+import { BanIcon, CircleCheckBigIcon, EllipsisIcon, PencilIcon, RotateCcwIcon, Trash2Icon, Undo2Icon } from 'lucide-react'
 import { ConfirmDialog } from '@/components/feedback/ConfirmDialog'
 import { SkeletonText } from '@/components/feedback/SkeletonText'
 import { Button } from '@/components/ui/button'
@@ -23,6 +23,7 @@ import { SaleBadges } from '../SaleBadges'
 import { useSaleModal } from '../../hooks/use-sale-modal'
 import { CompleteDialog } from './CompleteDialog'
 import { Panel } from './Panel'
+import { RefundDialog } from './RefundDialog'
 import { QuickActions, QuickActionsSkeleton } from './QuickActions'
 
 interface SaleIdentityProps {
@@ -65,6 +66,7 @@ export function SaleIdentitySkeleton() {
 export function SaleIdentity({ sale, onDeleted, onQuickAction }: SaleIdentityProps) {
   const saleModal = useSaleModal()
   const [completing, setCompleting] = useState(false)
+  const [refunding, setRefunding] = useState(false)
   const [confirm, setConfirm] = useState<Confirm>(null)
   const setCompleted = useSetCompletedMutation()
   const setCancelled = useSetCancelledMutation()
@@ -150,6 +152,12 @@ export function SaleIdentity({ sale, onDeleted, onQuickAction }: SaleIdentityPro
                 Cancel sale
               </DropdownMenuItem>
             )}
+            {sale.summary.collected > 0 && (
+              <DropdownMenuItem onSelect={() => setRefunding(true)}>
+                <Undo2Icon />
+                Refund client
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive" onSelect={() => setConfirm('delete')}>
               <Trash2Icon />
@@ -180,6 +188,7 @@ export function SaleIdentity({ sale, onDeleted, onQuickAction }: SaleIdentityPro
         ))}
 
       {completing && <CompleteDialog open onOpenChange={setCompleting} sale={sale} />}
+      {refunding && <RefundDialog open onOpenChange={setRefunding} sale={sale} />}
       <ConfirmDialog
         open={active !== null}
         onOpenChange={(open) => !open && setConfirm(null)}

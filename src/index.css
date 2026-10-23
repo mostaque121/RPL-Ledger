@@ -117,9 +117,9 @@
   --chart-expense: oklch(0.64 0.16 50);
   --chart-profit: oklch(0.48 0.15 330);
 
-  /* table header: plain neutral grey (no tint), dark labels */
-  --table-head: oklch(99.405% 0.00011 271.152);
-  --table-head-foreground: oklch(23.503% 0.00003 271.152);
+  /* table header: a grey band, clearly darker than the white card, with dark labels */
+  --table-head: oklch(0.925 0.008 258);
+  --table-head-foreground: oklch(0.24 0.02 262);
 
   /* dark ink sidebar in both themes for a strong frame */
   --sidebar: oklch(0.22 0.045 264);
@@ -172,8 +172,9 @@
   --chart-expense: oklch(0.64 0.16 50);
   --chart-profit: oklch(0.52 0.15 330);
 
-  --table-head: oklch(0.23 0.032 264);
-  --table-head-foreground: oklch(0.9 0 0);
+  /* table header: a band lighter than the card (0.23), with light labels */
+  --table-head: oklch(0.31 0.03 264);
+  --table-head-foreground: oklch(0.93 0 0);
 
   --sidebar: oklch(0.11 0.02 264);
   --sidebar-foreground: oklch(0.88 0.015 260);

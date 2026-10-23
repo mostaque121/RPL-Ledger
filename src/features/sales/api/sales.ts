@@ -219,6 +219,34 @@ export function useUpdateSaleMutation() {
   return useAppMutation({ mutationFn: updateSale, invalidate: SALE_LIST_KEYS, success: 'Sale saved' })
 }
 
+/** The details that can be edited in place on the sale page. */
+export type SalePatch = Partial<
+  Pick<SaleInput, 'saleDate' | 'sellerId' | 'phone' | 'email' | 'courseId' | 'rtoId' | 'source' | 'docsLink'>
+>
+
+const PATCH_COLUMNS = {
+  saleDate: 'sale_date',
+  sellerId: 'seller_id',
+  phone: 'phone',
+  email: 'email',
+  courseId: 'course_id',
+  rtoId: 'rto_id',
+  source: 'source',
+  docsLink: 'docs_link',
+} as const satisfies Record<keyof SalePatch, keyof ReturnType<typeof toRow>>
+
+/** Saves only the given fields (an inline edit on the sale page). */
+async function patchSale({ id, patch }: { id: string; patch: SalePatch }) {
+  const row = Object.fromEntries(
+    Object.entries(patch).map(([key, value]) => [PATCH_COLUMNS[key as keyof SalePatch], value]),
+  ) as Partial<ReturnType<typeof toRow>>
+  unwrap(await supabase.from('sales').update(row).eq('id', id))
+}
+
+export function usePatchSaleMutation() {
+  return useAppMutation({ mutationFn: patchSale, invalidate: SALE_LIST_KEYS, success: 'Saved' })
+}
+
 /** Payments, RTO payments, notes and tasks go with it. A linked commission expense stays (it was paid). */
 async function deleteSale(id: string) {
   unwrap(await supabase.from('sales').delete().eq('id', id))
@@ -245,6 +273,20 @@ export function useSetCompletedMutation() {
 async function setCancelled({ id, cancelled }: { id: string; cancelled: boolean }) {
   const patch = cancelled ? { cancelled, completed_on: null } : { cancelled }
   unwrap(await supabase.from('sales').update(patch).eq('id', id))
+}
+
+/** Refunding a client: a negative payment, and the sale is cancelled (it earns nothing). */
+async function refundSale({ id, paidOn, amount, note }: { id: string; paidOn: IsoDate; amount: Cents; note: string | null }) {
+  unwrap(await supabase.from('payments').insert({ sale_id: id, paid_on: paidOn, amount: -fromCents(amount), note }))
+  await setCancelled({ id, cancelled: true })
+}
+
+export function useRefundSaleMutation() {
+  return useAppMutation({
+    mutationFn: refundSale,
+    invalidate: [salesKeys.all],
+    success: () => 'Refund recorded, sale cancelled',
+  })
 }
 
 export function useSetCancelledMutation() {

@@ -4,7 +4,6 @@ import { FullScreenLoader } from '@/components/feedback/FullScreenLoader'
 import { NotFoundPage } from '@/components/feedback/NotFoundPage'
 import { AppError, PageError } from '@/components/feedback/RouteError'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
-import { LoginPage } from '@/features/auth/pages/LoginPage'
 
 type SettingsSections = typeof import('@/features/settings/pages/SettingsSections')
 
@@ -14,7 +13,13 @@ const settingsPage = (name: keyof SettingsSections) =>
 
 /** Each feature page is loaded on demand, so the first load stays small. */
 export const router = createBrowserRouter([
-  { path: '/login', Component: LoginPage, ErrorBoundary: AppError },
+  {
+    // Signed-in visits (most of them) never need the login form, so it loads on demand.
+    path: '/login',
+    lazy: () => import('@/features/auth/pages/LoginPage').then((m) => ({ Component: m.LoginPage })),
+    HydrateFallback: FullScreenLoader,
+    ErrorBoundary: AppError,
+  },
   {
     Component: ProtectedRoute,
     HydrateFallback: FullScreenLoader,

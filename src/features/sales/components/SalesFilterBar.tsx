@@ -29,6 +29,7 @@ const STATIC_OPTIONS = {
     { value: 'open', label: 'Open' },
     { value: 'completed', label: 'Completed' },
     { value: 'cancelled', label: 'Cancelled' },
+    { value: 'refunded', label: 'Refunded' },
   ],
   rtoPay: [{ value: 'due', label: 'RTO not paid' }],
   source: SALE_SOURCES.map((s) => ({ value: s, label: s })),

@@ -130,7 +130,7 @@ Keep these tables. Use `numeric(12,2)` for money, `uuid` primary keys, and `crea
   (`rateOn` in `src/features/employees/rates.ts`, SQL `employee_rate_on`). Salaries use the pay date, commissions the sale's completed date.
 - `rtos`: name (unique), active
 - `courses`: name (unique), active (managed on Settings; sales pick from it, reports group by it)
-- `sales`: sale_date, seller_id → people, client_name, phone, email, course_id → courses, rto_id → rtos, course_fee, rto_cost, referral_commission (default 0), source (`Website` | `Reference` | `Repeat client` | `Other`), docs_link, notes, completed_on (date, nullable), cancelled (bool)
+- `sales`: sale_date, seller_id → people, client_name, phone, email, course_id → courses, rto_id → rtos, course_fee, rto_cost, referral_commission (default 0), source (`Website` | `Reference` | `Repeat client` | `Social Media` | `Whatsapp Text` | `Agent` | `Other`), docs_link, notes, completed_on (date, nullable), cancelled (bool)
 - `payments`: sale_id → sales, paid_on, amount, note
 - `rto_payments`: sale_id → sales, paid_on, amount, agency (text, e.g. OS / OC / NC), note
 - `expenses`: spent_on, category (`Ads` | `Software` | `Phone` | `Salary` | `Employee commission` | `Lead cost` | `Other`), description, amount_aud, original_amount, currency (`AUD` | `BDT`), fx_rate, employee_id → people (nullable), sale_id → sales (nullable, links an employee commission to its sale), split (`shared` | `tanvir` | `md`)

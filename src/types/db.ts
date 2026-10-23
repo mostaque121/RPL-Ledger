@@ -31,7 +31,7 @@ type TableOf<
 
 export type PersonRole = 'partner' | 'employee'
 export type PartnerKeyDb = 'tanvir' | 'md'
-export type SaleSource = 'Website' | 'Reference' | 'Repeat client' | 'Other'
+export type SaleSource = 'Website' | 'Reference' | 'Repeat client' | 'Social Media' | 'Whatsapp Text' | 'Agent' | 'Other'
 export type ExpenseCategory = 'Ads' | 'Software' | 'Phone' | 'Salary' | 'Employee commission' | 'Lead cost' | 'Other'
 export type Currency = 'AUD' | 'BDT'
 export type ExpenseSplitDb = 'shared' | 'tanvir' | 'md'

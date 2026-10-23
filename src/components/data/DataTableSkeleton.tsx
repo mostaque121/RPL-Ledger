@@ -6,7 +6,18 @@ import { LoadingRegion, SkeletonText } from '@/components/feedback/SkeletonText'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
-import { BODY_CELL, FOOT_CELL, HEAD_CELL, HEAD_ROW, TABLE_CARD } from './table-styles'
+import {
+  BODY_CELL,
+  FILL_CARD,
+  FILL_GRID,
+  FOOT_CELL,
+  HEAD_CELL,
+  HEAD_ROW,
+  STICKY_FOOT,
+  STICKY_FOOT_ROW,
+  STICKY_HEAD,
+  TABLE_CARD,
+} from './table-styles'
 
 /**
  * What a cell looks like while loading. Set on a column as `meta.skeleton`; without it a
@@ -71,10 +82,12 @@ interface DataTableSkeletonProps<T> {
   totals?: readonly string[]
   /** Search / filters above the table, as on `DataTable`. */
   toolbar?: ReactNode
+  /** As on `DataTable`. */
+  fill?: boolean
 }
 
 /** `DataTable`'s placeholder: the real card, the real column headers, and rows shaped like each column's cells. */
-export function DataTableSkeleton<T>({ columns, columnOrder, columnVisibility, rows = 8, totals, toolbar }: DataTableSkeletonProps<T>) {
+export function DataTableSkeleton<T>({ columns, columnOrder, columnVisibility, rows = 8, totals, toolbar, fill = false }: DataTableSkeletonProps<T>) {
   const order = columnOrder ?? []
   const shown = columns
     .filter((c) => c.id && columnVisibility?.[c.id] !== false)
@@ -82,57 +95,59 @@ export function DataTableSkeleton<T>({ columns, columnOrder, columnVisibility, r
   const countCol = totals && shown.find((c) => !totals.includes(c.id ?? ''))?.id
 
   return (
-    <LoadingRegion className={TABLE_CARD}>
-      {toolbar && <div className="border-b">{toolbar}</div>}
-      <Table>
-        <TableHeader>
-          <TableRow className={HEAD_ROW}>
-            {shown.map((c) => {
-              const label = typeof c.header === 'string' ? c.header : ''
-              const right = c.meta?.align === 'right'
-              const sortable = c.enableSorting !== false && label !== '' && 'accessorFn' in c
-              return (
-                <TableHead key={c.id} className={cn(HEAD_CELL, right && 'text-right')}>
-                  <span className={cn('inline-flex items-center gap-1', right && 'flex-row-reverse')}>
-                    {label}
-                    {sortable && <ArrowUpDownIcon className="size-3 opacity-40" />}
-                  </span>
-                </TableHead>
-              )
-            })}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {Array.from({ length: rows }, (_, r) => (
-            <TableRow key={r} className="hover:bg-transparent">
-              {shown.map((c, col) => {
-                const right = c.meta?.align === 'right'
-                const kind = c.meta?.skeleton ?? (right ? 'amount' : 'text')
-                return (
-                  <TableCell key={c.id} className={cn(BODY_CELL, right && 'text-right')}>
-                    <Cell kind={kind} right={right} i={r + col} />
-                  </TableCell>
-                )
-              })}
-            </TableRow>
-          ))}
-        </TableBody>
-        {totals && (
-          <TableFooter>
-            <TableRow className="hover:bg-transparent">
+    <LoadingRegion className={cn(TABLE_CARD, fill && FILL_CARD)}>
+      {toolbar && <div className="shrink-0 border-b">{toolbar}</div>}
+      <div className={cn(fill && FILL_GRID)}>
+        <Table>
+          <TableHeader className={cn(fill && STICKY_HEAD)}>
+            <TableRow className={HEAD_ROW}>
               {shown.map((c) => {
+                const label = typeof c.header === 'string' ? c.header : ''
                 const right = c.meta?.align === 'right'
-                const has = c.id === countCol || totals.includes(c.id ?? '')
+                const sortable = c.enableSorting !== false && label !== '' && 'accessorFn' in c
                 return (
-                  <TableCell key={c.id} className={cn(FOOT_CELL, right && 'text-right')}>
-                    {has && <SkeletonText align={right ? 'right' : undefined} className={c.id === countCol ? 'w-16' : 'w-18'} />}
-                  </TableCell>
+                  <TableHead key={c.id} className={cn(HEAD_CELL, right && 'text-right')}>
+                    <span className={cn('inline-flex items-center gap-1', right && 'flex-row-reverse')}>
+                      {label}
+                      {sortable && <ArrowUpDownIcon className="size-3 opacity-40" />}
+                    </span>
+                  </TableHead>
                 )
               })}
             </TableRow>
-          </TableFooter>
-        )}
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {Array.from({ length: rows }, (_, r) => (
+              <TableRow key={r} className="hover:bg-transparent">
+                {shown.map((c, col) => {
+                  const right = c.meta?.align === 'right'
+                  const kind = c.meta?.skeleton ?? (right ? 'amount' : 'text')
+                  return (
+                    <TableCell key={c.id} className={cn(BODY_CELL, right && 'text-right')}>
+                      <Cell kind={kind} right={right} i={r + col} />
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            ))}
+          </TableBody>
+          {totals && (
+            <TableFooter className={cn(fill && STICKY_FOOT)}>
+              <TableRow className={cn('hover:bg-transparent', fill && STICKY_FOOT_ROW)}>
+                {shown.map((c) => {
+                  const right = c.meta?.align === 'right'
+                  const has = c.id === countCol || totals.includes(c.id ?? '')
+                  return (
+                    <TableCell key={c.id} className={cn(FOOT_CELL, right && 'text-right')}>
+                      {has && <SkeletonText align={right ? 'right' : undefined} className={c.id === countCol ? 'w-16' : 'w-18'} />}
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            </TableFooter>
+          )}
+        </Table>
+      </div>
     </LoadingRegion>
   )
 }

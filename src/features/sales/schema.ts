@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { SaleSource } from '@/types/db'
 
-export const SALE_SOURCES = ['Website', 'Reference', 'Repeat client', 'Other'] as const satisfies readonly SaleSource[]
+export const SALE_SOURCES = ['Website', 'Reference', 'Repeat client', 'Social Media', 'Whatsapp Text', 'Agent', 'Other'] as const satisfies readonly SaleSource[]
 
 export const isoDate = (message: string) => z.string({ error: message }).regex(/^\d{4}-\d{2}-\d{2}$/, message)
 
@@ -58,6 +58,15 @@ export const paymentSchema = z.object({
 })
 
 export type PaymentValues = z.infer<typeof paymentSchema>
+
+/** The amount given back, entered as a positive number (saved as a negative payment). */
+export const refundSchema = z.object({
+  paidOn: isoDate('Pick the date'),
+  amount: cents('Enter the amount').refine((n) => n > 0, "Can't be 0"),
+  note: optionalText(200),
+})
+
+export type RefundValues = z.infer<typeof refundSchema>
 
 export const taskSchema = z.object({
   title: z.string().trim().min(1, 'What needs doing?').max(200, 'Keep it under 200 characters'),

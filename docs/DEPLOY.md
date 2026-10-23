@@ -47,10 +47,23 @@ add them, then **Deployments → Retry deployment**.
 - Sign-ups stay **off** (Authentication → Sign In / Providers), so the public URL is safe: only the
   existing login can get in.
 
-## Custom domain (optional)
+## Custom domain: `crm.rplfastrack.com`
 
-Pages project → **Custom domains** → **Set up a domain**, e.g. `ledger.example.com.au`. Then update the
-Supabase Site URL to match.
+The domain's DNS stays at GoDaddy (the main site, `rplfastrack.com` and `www`, is on Vercel). Pages
+accepts a subdomain whose DNS is elsewhere, through one CNAME record. Order matters: add the domain in
+Pages **first**, then the record at GoDaddy, or the address shows an error until Pages catches up.
+
+1. Pages project → **Custom domains** → **Set up a custom domain** → `crm.rplfastrack.com` → Continue.
+   Pages then shows the CNAME it expects.
+2. GoDaddy → My Products → `rplfastrack.com` → **DNS** → **Add New Record**:
+   - Type **CNAME**, Name **`crm`**, Value **`<project>.pages.dev`** (exactly as Pages shows it), TTL 1 hour.
+   - Leave the Vercel records (`@`, `www`) and any email records (MX, TXT) as they are.
+3. Back in Pages, the domain goes from *Verifying* to **Active** (minutes, sometimes up to a day). Pages
+   issues the HTTPS certificate itself.
+4. Supabase → Authentication → **URL Configuration**: Site URL `https://crm.rplfastrack.com`, and add it
+   under Redirect URLs (keep `http://localhost:5173` for development).
+
+The `<project>.pages.dev` address keeps working too. That's fine: it's the same app behind the same login.
 
 ## Deploy without Git (manual)
 
