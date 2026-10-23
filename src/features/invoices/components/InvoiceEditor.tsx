@@ -424,7 +424,7 @@ export function InvoiceEditor({ mode, onSaved, invoices, profile, sales }: Invoi
                         <MoneyInput
                           id="inv-paid"
                           symbol="$"
-                          placeholder="0.00"
+                          placeholder="0"
                           value={field.value ?? null}
                           onChange={field.onChange}
                           onBlur={field.onBlur}

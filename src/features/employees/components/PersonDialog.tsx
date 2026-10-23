@@ -105,7 +105,7 @@ export function PersonDialog({ open, onOpenChange, person }: PersonDialogProps) 
                       <MoneyInput
                         id="person-salary"
                         currency="BDT"
-                        placeholder="0.00"
+                        placeholder="0"
                         value={field.value}
                         onChange={field.onChange}
                         onBlur={field.onBlur}
@@ -125,7 +125,7 @@ export function PersonDialog({ open, onOpenChange, person }: PersonDialogProps) 
                       <MoneyInput
                         id="person-commission"
                         currency="BDT"
-                        placeholder="0.00"
+                        placeholder="0"
                         value={field.value}
                         onChange={field.onChange}
                         onBlur={field.onBlur}

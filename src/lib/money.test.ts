@@ -23,6 +23,7 @@ describe('parseAmount', () => {
 
   it('round-trips through amountToText', () => {
     expect(amountToText(123450)).toBe('1234.50')
+    expect(amountToText(160000)).toBe('1600')
     expect(amountToText(null)).toBe('')
     expect(parseAmount(amountToText(9999))).toBe(9999)
   })

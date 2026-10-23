@@ -15,6 +15,9 @@ interface MoneyInputProps extends Omit<ComponentProps<typeof Input>, 'value' | '
   allowNegative?: boolean
 }
 
+/** Zero shows as an empty field (with the `0` placeholder), so typing never has to clear it. */
+const toText = (minor: number | null) => (minor === 0 ? '' : amountToText(minor))
+
 /**
  * Money field. Shows the currency symbol, accepts `1,234.50`, and reports integer minor units.
  * Invalid text reports `null`, so the form's Zod schema shows the error.
@@ -27,14 +30,15 @@ export function MoneyInput({
   allowNegative = false,
   className,
   onBlur,
+  placeholder = '0',
   ...props
 }: MoneyInputProps) {
-  const [text, setText] = useState(() => amountToText(value))
+  const [text, setText] = useState(() => toText(value))
   // The last value this field reported. Anything else means the form changed it (reset, prefill).
   const [reported, setReported] = useState(value)
   if (value !== reported) {
     setReported(value)
-    setText(amountToText(value))
+    setText(toText(value))
   }
 
   function handleChange(next: string) {
@@ -55,12 +59,13 @@ export function MoneyInput({
         inputMode="decimal"
         autoComplete="off"
         value={text}
+        placeholder={placeholder}
         onChange={(e) => handleChange(e.target.value)}
         onBlur={(e) => {
-          if (value !== null) setText(amountToText(value))
+          if (value !== null) setText(toText(value))
           onBlur?.(e)
         }}
-        className={cn('money pl-9 text-right', className)}
+        className={cn('money pl-9', className)}
         {...props}
       />
     </div>

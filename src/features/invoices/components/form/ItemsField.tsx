@@ -89,7 +89,7 @@ export function ItemsField({ form, courseNames }: ItemsFieldProps) {
                       <MoneyInput
                         aria-label={`Item ${i + 1} price`}
                         symbol="$"
-                        placeholder="0.00"
+                        placeholder="0"
                         value={field.value ?? null}
                         onChange={field.onChange}
                         onBlur={field.onBlur}

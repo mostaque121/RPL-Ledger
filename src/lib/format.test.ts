@@ -14,10 +14,12 @@ import {
 } from './format'
 
 describe('format', () => {
-  it('formats AUD from cents', () => {
-    expect(formatAud(123400)).toBe('$1,234.00')
-    expect(formatAud(-6400)).toBe('−$64.00')
-    expect(formatAud(0)).toBe('$0.00')
+  it('formats AUD from cents, dropping .00 but keeping real cents', () => {
+    expect(formatAud(123400)).toBe('$1,234')
+    expect(formatAud(-6400)).toBe('−$64')
+    expect(formatAud(0)).toBe('$0')
+    expect(formatAud(24887)).toBe('$248.87')
+    expect(formatAud(123450)).toBe('$1,234.50')
   })
 
   it('formats BDT with South Asian grouping', () => {

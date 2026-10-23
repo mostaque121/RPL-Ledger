@@ -26,7 +26,8 @@ export const saleSchema = z
     courseId: z.string(),
     rtoId: z.string(),
     courseFee: cents('Enter the course fee'),
-    rtoCost: cents('Enter the RTO cost (0 if none)'),
+    /** Empty = 0 (not known yet, or none). */
+    rtoCost: cents('Enter the RTO cost').nullable(),
     referralCommission: cents('Enter 0 if there is no referral').nullable(),
     source: z.enum(SALE_SOURCES),
     docsLink: z.union([z.literal(''), z.url('Enter a full link, starting with https://')]),

@@ -7,26 +7,26 @@ export const BUSINESS_TIME_ZONE = 'Australia/Sydney'
 const audNumber = new Intl.NumberFormat('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const bdtNumber = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }) // 1,23,400
 
-/** `$1,234.00`, negative as `−$1,234.00`. Everything is AUD, so no `A$`. */
-export function formatAud(cents: Cents): string {
-  const sign = cents < 0 ? '−' : ''
-  return `${sign}$${audNumber.format(Math.abs(cents) / 100)}`
-}
-
 const audWhole = new Intl.NumberFormat('en-AU', { maximumFractionDigits: 0 })
 
 /**
  * `$1,234` for round figures, `$248.87` when there are cents (e.g. a BDT expense converted to AUD),
- * so nothing is hidden by rounding. For stats and the sale page, where amounts are almost always whole.
+ * so nothing is hidden by rounding. Negative as `−$1,234`. Everything is AUD, so no `A$`.
  */
-export function formatAudShort(cents: Cents): string {
-  if (cents % 100 !== 0) return formatAud(cents)
+export function formatAud(cents: Cents): string {
   const sign = cents < 0 ? '−' : ''
-  return `${sign}$${audWhole.format(Math.abs(cents) / 100)}`
+  const number = cents % 100 === 0 ? audWhole : audNumber
+  return `${sign}$${number.format(Math.abs(cents) / 100)}`
 }
 
-/** Client-facing documents (invoices). Same as `formatAud`. */
-export const formatDollars = formatAud
+/** Same as `formatAud` (kept so existing `short` call sites read the same). */
+export const formatAudShort = formatAud
+
+/** Client-facing documents (invoices): always with cents, `$1,234.00`. */
+export function formatDollars(cents: Cents): string {
+  const sign = cents < 0 ? '−' : ''
+  return `${sign}$${audNumber.format(Math.abs(cents) / 100)}`
+}
 
 /** `৳1,23,400` (South Asian grouping, whole taka). */
 export function formatBdt(taka: number): string {

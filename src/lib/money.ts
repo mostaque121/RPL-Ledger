@@ -55,7 +55,8 @@ export function parseAmount(text: string): number | null {
   return toCents(Number(cleaned))
 }
 
-/** Integer minor units → editable text, e.g. `123450` → `1234.50`. */
+/** Integer minor units → editable text, e.g. `123450` → `1234.50`, `160000` → `1600`. */
 export function amountToText(minor: number | null): string {
-  return minor === null ? '' : (minor / 100).toFixed(2)
+  if (minor === null) return ''
+  return minor % 100 === 0 ? String(minor / 100) : (minor / 100).toFixed(2)
 }

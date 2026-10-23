@@ -43,7 +43,7 @@ function defaults(sale?: SaleView): SaleValues {
     courseId: sale?.courseId ?? '',
     rtoId: sale?.rtoId ?? '',
     courseFee: sale ? sale.courseFee : (null as unknown as number),
-    rtoCost: sale ? sale.rtoCost : (null as unknown as number),
+    rtoCost: sale ? sale.rtoCost : null,
     referralCommission: sale ? sale.referralCommission : null,
     source: sale?.source ?? 'Website',
     docsLink: sale?.docsLink ?? '',
@@ -117,7 +117,7 @@ export function SaleForm({ settings, sale, onSaved }: SaleFormProps) {
       courseId: v.courseId || null,
       rtoId: v.rtoId || null,
       courseFee: v.courseFee,
-      rtoCost: v.rtoCost,
+      rtoCost: v.rtoCost ?? 0,
       referralCommission: v.referralCommission ?? 0,
       source: v.source,
       docsLink: orNull(v.docsLink),
@@ -287,13 +287,13 @@ export function SaleForm({ settings, sale, onSaved }: SaleFormProps) {
           <FormCard icon={WalletIcon} title="Money" description="Use Preview to see the profit, tax and who gets what.">
             <div className="grid gap-4 sm:grid-cols-3">
               <MoneyField control={form.control} name="courseFee" id="sale-fee" label="Course fee" error={errors.courseFee} />
-              <MoneyField control={form.control} name="rtoCost" id="sale-rto-cost" label="RTO cost" error={errors.rtoCost} />
+              <MoneyField control={form.control} name="rtoCost" id="sale-rto-cost" label="RTO cost" hint="Leave empty if not known yet." error={errors.rtoCost} />
               <MoneyField
                 control={form.control}
                 name="referralCommission"
                 id="sale-referral"
                 label="Referral"
-                placeholder="0.00"
+                placeholder="0"
                 hint="Paid to an outside referrer."
                 error={errors.referralCommission}
               />
@@ -305,7 +305,7 @@ export function SaleForm({ settings, sale, onSaved }: SaleFormProps) {
                   Paid today? <span className="font-normal text-muted-foreground">(optional)</span>
                 </p>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <MoneyField control={form.control} name="firstPayment" id="sale-first-payment" label="Amount received" placeholder="0.00" error={errors.firstPayment} />
+                  <MoneyField control={form.control} name="firstPayment" id="sale-first-payment" label="Amount received" placeholder="0" error={errors.firstPayment} />
                   <Field data-invalid={!!errors.firstPaymentOn}>
                     <FieldLabel htmlFor="sale-first-payment-on">Received on</FieldLabel>
                     <Controller
