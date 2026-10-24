@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { PencilIcon, Trash2Icon } from 'lucide-react'
 import { Link } from 'react-router'
@@ -22,6 +22,8 @@ interface ExpensesTableProps {
   onDelete: (expense: Expense) => void
   /** The viewer's columns: order and which are shown. Edit / delete always stay last. */
   view: readonly ViewItem<ExpenseColumnId>[]
+  /** Shown in the card when no expense matches. */
+  empty?: ReactNode
 }
 
 const dash = <span className="text-muted-foreground/60">—</span>
@@ -189,11 +191,12 @@ export function ExpensesTableSkeleton({ view }: { view: readonly ViewItem<Expens
       columnVisibility={columnVisibility}
       totals={['amount', 'tanvir', 'md']}
       rows={10}
+      fill
     />
   )
 }
 
-export function ExpensesTable({ expenses, settings, onEdit, onDelete, view }: ExpensesTableProps) {
+export function ExpensesTable({ expenses, settings, onEdit, onDelete, view, empty }: ExpensesTableProps) {
   const { columnOrder, columnVisibility } = useColumnView(view)
   const columns = useMemo(() => expenseColumns(settings, onEdit, onDelete), [settings, onEdit, onDelete])
 
@@ -208,6 +211,8 @@ export function ExpensesTable({ expenses, settings, onEdit, onDelete, view }: Ex
       noun="expense"
       columnOrder={columnOrder}
       columnVisibility={columnVisibility}
+      empty={empty}
+      fill
       totals={{
         amount: <Amount cents={t.total} className="text-danger" />,
         tanvir: <Amount cents={t.split.tanvir} />,

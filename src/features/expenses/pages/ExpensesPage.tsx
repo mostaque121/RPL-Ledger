@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { BanknoteIcon, PlusIcon, SearchXIcon, WalletIcon } from 'lucide-react'
+import { FILL_PAGE } from '@/components/data/table-styles'
 import type { CustomizerSection } from '@/components/data/ViewCustomizer'
 import { ConfirmDialog } from '@/components/feedback/ConfirmDialog'
 import { EmptyState } from '@/components/feedback/EmptyState'
@@ -83,7 +84,7 @@ export function ExpensesPage() {
   )
   // Search and filters work straight away; only the rows wait for the data.
   const skeleton = (
-    <div className="space-y-4">
+    <div className={FILL_PAGE}>
       {filterBar}
       <ExpensesTableSkeleton view={columns} />
     </div>
@@ -119,17 +120,23 @@ export function ExpensesPage() {
               }
             />
           ) : (
-            <div className="space-y-4">
+            <div className={FILL_PAGE}>
               {filterBar}
-              {shown.length === 0 ? (
-                <EmptyState
-                  icon={SearchXIcon}
-                  title={`No matching expenses${filters.month === 'all' ? '' : ` in ${period}`}`}
-                  description="Try another month, or clear the filters."
-                />
-              ) : (
-                <ExpensesTable expenses={shown} settings={settings} view={columns} onEdit={setEditing} onDelete={onDelete} />
-              )}
+              <ExpensesTable
+                expenses={shown}
+                settings={settings}
+                view={columns}
+                onEdit={setEditing}
+                onDelete={onDelete}
+                empty={
+                  <EmptyState
+                    icon={SearchXIcon}
+                    className="border-0 py-12"
+                    title={`No matching expenses${filters.month === 'all' ? '' : ` in ${period}`}`}
+                    description="Try another month, or clear the filters."
+                  />
+                }
+              />
             </div>
           )
         }

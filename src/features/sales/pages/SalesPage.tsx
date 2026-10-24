@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { PlusIcon, ReceiptTextIcon, SearchXIcon } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router'
+import { FILL_PAGE } from '@/components/data/table-styles'
 import type { CustomizerSection } from '@/components/data/ViewCustomizer'
 import { EmptyState } from '@/components/feedback/EmptyState'
 import { QueryView } from '@/components/feedback/QueryView'
@@ -22,13 +23,6 @@ import { useSaleModal } from '../hooks/use-sale-modal'
 import { useSalesParams } from '../hooks/use-sales-params'
 import { saleHref } from '../links'
 import { effectiveFilters, FILTER_FIELD, SALE_COLUMNS, SALE_FILTERS, type SaleFilterId } from '../view'
-
-/**
- * On desktop the page is exactly the visible card's height (the inset's 100svh − 1rem, minus the
- * 3.5rem top bar and the 3rem of `main` padding), so the table card fills the rest and only its rows
- * scroll. Phones keep the normal page scroll.
- */
-const FILL_PAGE = 'flex flex-col gap-4 md:h-[calc(100svh-7.5rem)]'
 
 export function SalesPage() {
   const sales = useSalesQuery()

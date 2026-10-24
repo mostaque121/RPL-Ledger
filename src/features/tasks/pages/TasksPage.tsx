@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { ListTodoIcon, PlusIcon, SearchXIcon } from 'lucide-react'
+import { FILL_PAGE } from '@/components/data/table-styles'
 import type { CustomizerSection } from '@/components/data/ViewCustomizer'
 import { EmptyState } from '@/components/feedback/EmptyState'
 import { ErrorState } from '@/components/feedback/ErrorState'
@@ -123,7 +124,7 @@ export function TasksPage() {
         </Button>
       </PageActions>
 
-      <div className="space-y-4">
+      <div className={FILL_PAGE}>
         <TasksTabs value={filters.tab} onChange={(tab) => setFilters({ tab })} counts={view?.counts ?? null} />
         <TasksFilterBar
           filters={filters}
